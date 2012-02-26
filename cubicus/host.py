@@ -1,31 +1,22 @@
 
-from threading import Thread
-from cubicus.utils import LogMixin
+import os
+from cubicus.utils import SocketThread
 
-class ApplicationSocketThread(Thread, LogMixin):
+class ApplicationSocketThread(SocketThread):
     """
     Accepts a socket to a local Cubicus-enabled application and services it
     """
-    def __init__(self, clientsocket):
-        Thread.__init__(self)
-        self._sock = clientsocket
-        self.daemon = True
-        self._continue = True
+    #def __init__(self, clientsocket):
+        #SocketThread.__init__(self, clientsocket)
 
-    def stop(self):
-        self._continue = False
+    def allowed_types(self):
+        types = ['application_identify', 'switch_context']
+        return SocketThread.allowed_types(self) + types
 
-    def run(self):
-        sock = self._sock
-        self.log('Spawned')
+    def handle_application_identify(self, contexts):
+        pass
+        # TODO: context to Context objects? pass to manager
 
-        self.log('Sending...')
-        sock.send('hello')
-        
-        #self.log('Receiving...')
-        #res = sock.recv(1024)
-        #self.log('Got "%s"' res)
-                    
-        self.log('Closing')
-        sock.close()
+    def handle_switch_context(self, context_id):
+        pass
 
