@@ -12,13 +12,13 @@ class DeviceSocketThread(SocketThread):
         self._paired = False
 
     def allowed_types(self):
-        return SocketThread.allowed_types(self) + ['identify']
+        return SocketThread.allowed_types(self) + ['device_identify']
 
     def send_applications(self):
         apps = map(lambda a: a.to_json(), self._manager.applications)
         self.queue_message('applications', apps)
 
-    def handle_identify(self, guid):
+    def handle_device_identify(self, guid):
         """
         Checks for existing pairing with the given GUID. If none
         exists, initiate the pairing process. Once paired, queues
