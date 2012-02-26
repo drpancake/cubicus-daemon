@@ -23,6 +23,17 @@ def accept_with_timeout(serversocket, timeout):
     else:
         return None
 
+class IDGenerator(object):
+    """
+    For generating unique IDs across all instances of a class
+    """
+    def __init__(self):
+        self._id = 0
+
+    def new_id(self):
+        self._id += 1
+        return self._id
+
 class LogMixin:
     def log(self, s):
         print '[%s: %s] %s' % (self.__class__.__name__, self.name, s)
