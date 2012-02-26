@@ -63,7 +63,8 @@ if __name__ == '__main__':
     bonjour_service = BonjourService(name, regtype, device_port)
     
     # Listeners for applications/devices
-    app_listener = ApplicationListener(app_port, ApplicationSocketThread)
+    app_listener = ApplicationListener(app_port, ApplicationSocketThread,
+                                       host='localhost')
     device_listener = DeviceListener(device_port, DeviceSocketThread)
 
     threads = [bonjour_service, app_listener, device_listener]

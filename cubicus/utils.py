@@ -33,24 +33,27 @@ class ConnectionListener(Thread, LogMixin):
     client_cls (Thread subclass implementing at least a stop() method)
     to service a new client.
     """
-    def __init__(self, port, client_cls):
+    def __init__(self, port, client_cls, host=None):
         Thread.__init__(self)
         self.daemon = True
         self._port = port
         self._cls = client_cls
         self._continue = True
         self._threads = []
+        self._host = host
 
     def stop(self):
         self._continue = False
 
     def run(self):
         # Open the socket
+        if self._host is None:
+            self._host = socket.gethostname()
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        serversocket.bind((socket.gethostname(), self._port))
+        serversocket.bind((self._host, self._port))
         serversocket.listen(5) # 5 queued max
 
-        self.log('Waiting for clients')
+        self.log('Waiting for clients @ %s:%s' % (self._host, self._port))
         try:
             while self._continue:
                 # Non-blocking accept() so we can gracefully close
