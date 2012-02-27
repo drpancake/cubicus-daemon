@@ -20,7 +20,8 @@ class DeviceSocketThread(SocketThread):
             self.send_state()
 
     def allowed_types(self):
-        return SocketThread.allowed_types(self) + ['device_identify']
+        types = ['device_identify', 'state']
+        return SocketThread.allowed_types(self) + types
 
     def send_applications(self):
         apps = map(lambda a: a.to_json(), self.manager.applications)
@@ -53,4 +54,8 @@ class DeviceSocketThread(SocketThread):
         # and 'state' messages
         self.send_applications()
         self.send_state()
+
+    def handle_state(self, state):
+        self.manager.current_application = state['current_application']
+        self.manager.current_context = state['current_context']
 
