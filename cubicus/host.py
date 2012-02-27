@@ -1,6 +1,8 @@
 
 import os
+
 from cubicus.utils import SocketThread
+from cubicus.models import Application, Context
 
 class ApplicationSocketThread(SocketThread):
     """
@@ -13,9 +15,9 @@ class ApplicationSocketThread(SocketThread):
         types = ['application_identify', 'switch_context']
         return SocketThread.allowed_types(self) + types
 
-    def handle_application_identify(self, contexts):
-        pass
-        # TODO: context to Context objects? pass to manager
+    def handle_application_identify(self, json_app):
+        app = Application.from_json(json_app)
+        self._manager.add_application(app)
 
     def handle_switch_context(self, context_id):
         pass
