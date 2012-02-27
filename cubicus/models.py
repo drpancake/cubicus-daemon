@@ -69,7 +69,7 @@ class Application(object):
         Expects content from an 'application_identify' message
         """
         name = d['name']
-        default = d['default_context']
+        default = d.get('default_context') # optional
         contexts = map(lambda c: Context.from_json(c), d['contexts'])
         app_id = Application.id_generator.new_id()
         return Application(app_id, default, name, contexts)

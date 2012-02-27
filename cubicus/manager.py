@@ -32,6 +32,16 @@ class Manager(Observable):
         Observable.__init__(self)
 
     def add_application(self, app):
+        # If no apps added yet, make this one current
+        if not self.applications:
+            self.current_application = app.application_id
+            # Set to app's default context if it was given,
+            # otherwise pick the first context
+            def_context = app.default_context
+            if def_context is None:
+                def_context = app.contexts[0].context_id
+            self.current_context = def_context
+
         # Brand new list so notify() is triggered
         self.applications += [app]
 
