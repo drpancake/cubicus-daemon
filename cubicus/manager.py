@@ -1,4 +1,5 @@
 
+from observable import Observable, new_attribute
 
 class Singleton(type):
     """
@@ -13,10 +14,7 @@ class Singleton(type):
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
-
-
-
-class Manager(object):
+class Manager(Observable):
     """
     Keeps track of current applications and their layouts,
     states, etc.
@@ -25,38 +23,19 @@ class Manager(object):
     between threads
     """
     __metaclass__ = Singleton
+
+    current_context = new_attribute('current_context')
+    current_application = new_attribute('current_application')
+    applications = new_attribute('applications', [])
     
     def __init__(self):
-        self._applications = []
-        self._current_application = None
-        self._current_context = None
+        Observable.__init__(self)
 
     def add_application(self, app):
-        self._applications.append(app)
-        # TODO: notify devices
+        # Brand new list so notify() is triggered
+        self.applications += [app]
 
     def remove_application(self, app):
-        # TODO
-        pass
-    
-    @property
-    def applications(self):
-        #b1 = {'type': 'button', 'id': make_id(), 'ratio': 0.25, 'label': 'My Label'}
-        #c1 = {'type': 'canvas', 'id': make_id(), 'ratio': 0.75}
-        #l1 = {'type': 'hbox', 'id': make_id(), 'ratio': 1, 'items': [b1, c1]}
-        #b2 = {'type': 'button', 'id': make_id(), 'ratio': 0.5, 'label': 'My Label'}
-        #c2 = {'type': 'canvas', 'id': make_id(), 'ratio': 0.5}
-        #l2 = {'type': 'hbox', 'id': make_id(), 'ratio': 1, 'items': [b2, c2]}
-        #self._applications = [Application()]
-        return self._applications
-
-    @property
-    def current_application(self):
-        #return self._current_application
-        return 1
-
-    @property
-    def current_context(self):
-        #return self._current_context
-        return 1
+        # Brand new list so notify() is triggered
+        self.applications = filter(lambda a: a != app, self.applications)
 
