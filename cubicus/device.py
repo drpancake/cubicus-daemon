@@ -15,7 +15,7 @@ class DeviceSocketThread(SocketThread):
         return SocketThread.allowed_types(self) + ['device_identify']
 
     def send_applications(self):
-        apps = map(lambda a: a.to_json(), self._manager.applications)
+        apps = map(lambda a: a.to_json(), self.manager.applications)
         self.queue_message('applications', apps)
 
     def handle_device_identify(self, guid):

@@ -17,7 +17,7 @@ class ApplicationSocketThread(SocketThread):
 
     def handle_application_identify(self, json_app):
         app = Application.from_json(json_app)
-        self._manager.add_application(app)
+        self.manager.add_application(app)
 
     def handle_switch_context(self, context_id):
         pass

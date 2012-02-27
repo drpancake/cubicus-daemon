@@ -89,7 +89,7 @@ class SocketThread(Thread, LogMixin):
         Thread.__init__(self)
         self._sock = clientsocket
         self._sendqueue = Queue()
-        self._manager = Manager()
+        self.manager = Manager()
         self.daemon = True
         self._continue = True
 
@@ -120,8 +120,8 @@ class SocketThread(Thread, LogMixin):
         self._sendqueue.put(s + LINE_DELIMITER)
 
     def send_state(self):
-        state = {'current_application': self._manager.current_application,
-                 'current_context': self._manager.current_context}
+        state = {'current_application': self.manager.current_application,
+                 'current_context': self.manager.current_context}
         self.queue_message('state', state)
 
     def run(self):
