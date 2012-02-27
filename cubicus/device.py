@@ -11,6 +11,14 @@ class DeviceSocketThread(SocketThread):
         SocketThread.__init__(self, clientsocket)
         self._paired = False
 
+        # Subscribe to manager updates
+        self.manager.subscribe(self)
+
+    def notify(self, name, new_value):
+        print '%s got %s => %s' % (self, name, new_value)
+        if name in ['current_context', 'current_application']:
+            self.send_state()
+
     def allowed_types(self):
         return SocketThread.allowed_types(self) + ['device_identify']
 

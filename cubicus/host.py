@@ -20,5 +20,5 @@ class ApplicationSocketThread(SocketThread):
         self.manager.add_application(app)
 
     def handle_switch_context(self, context_id):
-        pass
+        self.manager.current_context = context_id
 
