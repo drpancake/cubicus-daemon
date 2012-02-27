@@ -61,6 +61,7 @@ class ConnectionListener(Thread, LogMixin):
         if self._host is None:
             self._host = socket.gethostname()
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
         serversocket.bind((self._host, self._port))
         serversocket.listen(5) # 5 queued max
 
