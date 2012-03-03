@@ -120,9 +120,12 @@ class SocketThread(Thread, LogMixin):
         self._sendqueue.put(s + LINE_DELIMITER)
 
     def send_state(self):
-        state = {'current_application': self.manager.current_application,
-                 'current_context': self.manager.current_context}
-        self.queue_message('state', state)
+        a = self.manager.current_application
+        c = self.manager.current_context
+        # Only send if both are set
+        if a != None and c != None:
+            state = {'current_application': a, 'current_context': c}
+            self.queue_message('state', state)
 
     def run(self):
         sock = self._sock
