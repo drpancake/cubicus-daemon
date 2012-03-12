@@ -14,7 +14,7 @@ class ApplicationSocketThread(SocketThread):
         # Subscribe to manager updates
         self.manager.subscribe(self)
 
-    def notify(self, name, new_value):
+    def notify(self, obj, name, new_value):
         if name in ['current_application', 'current_context'] and self._app:
             # Notify app of changed context if we're the currently
             # active application ID

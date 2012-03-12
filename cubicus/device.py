@@ -14,7 +14,7 @@ class DeviceSocketThread(SocketThread):
         # Subscribe to manager updates
         self.manager.subscribe(self)
 
-    def notify(self, name, new_value):
+    def notify(self, obj, name, new_value):
         print '%s got %s => %s' % (self, name, new_value)
         if name in ['current_context', 'current_application']:
             self.send_state()
