@@ -1,43 +1,6 @@
 
 from cubicus.utils import IDGenerator
-
-class LayoutElement(object):
-    def __init__(self, element_id, element_type, ratio, ** params):
-        self.element_id = element_id
-        self.element_type = element_type
-        self.ratio = ratio
-        self._params = params
-
-    @staticmethod
-    def from_json(d):
-        id_ = d.pop('id')
-        type_ = d.pop('type')
-        ratio = d.pop('ratio')
-        
-        params = {}
-        # Convert items to models if we have it
-        if 'items' in d:
-            items = map(lambda item: LayoutElement.from_json(item),
-                        d.pop('items'))
-            params['items'] = items
-        # Anything else goes in params
-        params.update(d)
-
-        return LayoutElement(id_, type_, ratio, ** params)
-
-    def to_json(self):
-        d = {'id': self.element_id, 'type': self.element_type,
-             'ratio': self.ratio}
-
-        items = None
-        if self._params and 'items' in self._params:
-            items = map(lambda item: item.to_json(), self._params['items'])
-            d['items'] = items
-
-        for k, v in self._params.items():
-            if k != 'items':
-                d[k] = v
-        return d
+from cubicus.layout import LayoutElement
 
 class Context(object):
     def __init__(self, context_id, layout):
