@@ -9,6 +9,10 @@ class LayoutElement(Observable):
         self.ratio = ratio
         self._params = params
 
+    def notify(self, obj, name, new_value):
+        # Forward along incoming notifications to any observers
+        self.forward(obj, name, new_value)
+
     @staticmethod
     def from_json(d):
         id_ = d.pop('id')
@@ -33,8 +37,14 @@ class LayoutElement(Observable):
 class Box(LayoutElement):
     def __init__(self, element_id, element_type, ratio, ** params):
         LayoutElement.__init__(self, element_id, element_type, ratio, ** params)
-        self.items = map(lambda item: LayoutElement.from_json(item),
-                         params['items'])
+
+        # Convert 'items' list to objects
+        items = []
+        for item_json in params['items']:
+            item = LayoutElement.from_json(item_json)
+            item.subscribe(self) # Notifications will be forwarded
+            items.append(item)
+        self.items = items
     
     def to_json(self):
         # Augment base element JSON with each child item's JSON
@@ -43,10 +53,13 @@ class Box(LayoutElement):
         return d
 
 class Canvas(LayoutElement):
-    paths = new_attribute('paths', [])
+    def __init__(self, element_id, element_type, ratio, ** params):
+        LayoutElement.__init__(self, element_id, element_type, ratio, ** params)
+        self._paths = []
 
     def add_path(self, points):
-        self.paths += [points]
+        self._paths.append(points)
+        self.forward(self, 'event:new_path', points)
 
     def clear(self):
         pass

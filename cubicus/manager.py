@@ -31,6 +31,9 @@ class Manager(Observable):
     def __init__(self):
         Observable.__init__(self)
 
+    #def notify(self, obj, name, new_value):
+        #self.forward(self, obj, name, new
+
     def add_application(self, app):
         # If no apps added yet, make this one current
         if not self.applications:
@@ -48,4 +51,8 @@ class Manager(Observable):
     def remove_application(self, app):
         # Brand new list so notify() is triggered
         self.applications = filter(lambda a: a != app, self.applications)
+
+    def send_event(self, event):
+        # Forward to all applications
+        map(lambda event: app.send_event(event), self.applications)
 

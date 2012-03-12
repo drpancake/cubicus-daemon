@@ -59,3 +59,6 @@ class DeviceSocketThread(SocketThread):
         self.manager.current_application = state['current_application']
         self.manager.current_context = state['current_context']
 
+    def handle_event(self, event):
+        self.manager.send_event(Event.from_json(event))
+

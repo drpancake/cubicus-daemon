@@ -1,11 +1,18 @@
 
 from cubicus.utils import IDGenerator
 from cubicus.layout import LayoutElement
+from observable import Observable
 
-class Context(object):
+class Context(Observable):
     def __init__(self, context_id, layout):
         self.context_id = context_id
         self.layout = layout
+
+        # Notifications bubble up the layout hierarchy, ending
+        self.layout.subscribe(self)
+
+    def notify(self, obj, name, new_value):
+        self.forward(self, obj, name, new_value)
 
     @staticmethod
     def from_json(d):
@@ -16,7 +23,7 @@ class Context(object):
     def to_json(self):
         return {'id': self.context_id, 'layout': self.layout.to_json()}
 
-class Application(object):
+class Application(Observable):
     id_generator = IDGenerator()
     
     def __init__(self, application_id, default_context, name, contexts):
@@ -25,6 +32,14 @@ class Application(object):
         self.default_context = default_context
         self.name = name
         self.contexts = contexts
+
+    def notify(self, obj, name, new_value):
+        print 'App notify : %s, %s, %s' % (obj, name, new_value)
+        self.forward(self, obj, name, new_value)
+
+    def send_event(self, event):
+        if event.application_id == self.application_id:
+            print 'app %s accepted event: %s' % event
 
     @staticmethod
     def from_json(d):
@@ -46,4 +61,14 @@ class Application(object):
         #c1 = {'type': 'canvas', 'id': 2, 'ratio': 0.75}
         #l1 = {'type': 'hbox', 'id': 3, 'ratio': 1, 'items': [b1, c1]}
         #return {'id': 1, 'contexts': [{'id': 1, 'layout': l1}]}
+
+class Event(object):
+    def __init__(self):
+        self.application_id = 1
+        self.context_id = 1
+        self.element_id = 1
+        
+    @staticmethod
+    def from_json(d):
+        return Event()
 
