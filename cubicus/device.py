@@ -21,7 +21,7 @@ class DeviceSocketThread(SocketThread):
             self.send_state()
 
     def allowed_types(self):
-        types = ['device_identify', 'state']
+        types = ['device_identify', 'state', 'event']
         return SocketThread.allowed_types(self) + types
 
     def send_applications(self):
