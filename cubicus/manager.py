@@ -31,8 +31,8 @@ class Manager(Observable):
     def __init__(self):
         Observable.__init__(self)
 
-    #def notify(self, obj, name, new_value):
-        #self.forward(self, obj, name, new
+    def notify(self, obj, name, new_value):
+        print 'Manager got notify: %s, %s, %s' % (obj, name, new_value)
 
     def add_application(self, app):
         # If no apps added yet, make this one current
@@ -54,5 +54,5 @@ class Manager(Observable):
 
     def send_event(self, event):
         # Forward to all applications
-        map(lambda event: app.send_event(event), self.applications)
+        map(lambda app: app.send_event(event), self.applications)
 

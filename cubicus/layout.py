@@ -13,6 +13,10 @@ class LayoutElement(Observable):
         # Forward along incoming notifications to any observers
         self.forward(obj, name, new_value)
 
+    def send_event(self, event):
+        if event.element_id == self.element_id:
+            print '[!!!] Unhandled event for %s (%s)' % (self, event)
+
     @staticmethod
     def from_json(d):
         id_ = d.pop('id')
@@ -45,6 +49,9 @@ class Box(LayoutElement):
             item.subscribe(self) # Notifications will be forwarded
             items.append(item)
         self.items = items
+
+    def send_event(self, event):
+        map(lambda item: item.send_event(event), self.items)
     
     def to_json(self):
         # Augment base element JSON with each child item's JSON
@@ -56,6 +63,11 @@ class Canvas(LayoutElement):
     def __init__(self, element_id, element_type, ratio, ** params):
         LayoutElement.__init__(self, element_id, element_type, ratio, ** params)
         self._paths = []
+
+    def send_event(self, event):
+        if event.element_id == self.element_id:
+            print 'Canvas got event: %s' % event
+            self.add_path([(0, 0), (5, 5)])
 
     def add_path(self, points):
         self._paths.append(points)

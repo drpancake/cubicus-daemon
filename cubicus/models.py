@@ -8,11 +8,14 @@ class Context(Observable):
         self.context_id = context_id
         self.layout = layout
 
-        # Notifications bubble up the layout hierarchy, ending
+        # Notifications bubble up the layout hierarchy
         self.layout.subscribe(self)
 
     def notify(self, obj, name, new_value):
-        self.forward(self, obj, name, new_value)
+        self.forward(obj, name, new_value)
+
+    def send_event(self, event):
+        self.layout.send_event(event)
 
     @staticmethod
     def from_json(d):
@@ -27,19 +30,23 @@ class Application(Observable):
     id_generator = IDGenerator()
     
     def __init__(self, application_id, default_context, name, contexts):
-        # TODO: @property for these?
         self.application_id = application_id
         self.default_context = default_context
         self.name = name
         self.contexts = contexts
 
+        # Observe all contexts
+        #for context in self.contexts:
+            #context.subscribe(self)
+
     def notify(self, obj, name, new_value):
         print 'App notify : %s, %s, %s' % (obj, name, new_value)
-        self.forward(self, obj, name, new_value)
+        self.forward(obj, name, new_value)
 
     def send_event(self, event):
         if event.application_id == self.application_id:
-            print 'app %s accepted event: %s' % event
+            print 'app %s accepted event: %s' % (self, event)
+            map(lambda c: c.send_event(event), self.contexts)
 
     @staticmethod
     def from_json(d):
@@ -66,7 +73,7 @@ class Event(object):
     def __init__(self):
         self.application_id = 1
         self.context_id = 1
-        self.element_id = 1
+        self.element_id = 3
         
     @staticmethod
     def from_json(d):
