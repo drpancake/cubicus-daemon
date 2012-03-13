@@ -8,7 +8,8 @@ class Context(object):
         self.layout = layout
 
     def send_event(self, event):
-        self.layout.send_event(event)
+        if event.context_id == self.context_id:
+            self.layout.send_event(event)
 
     @staticmethod
     def from_json(d):
