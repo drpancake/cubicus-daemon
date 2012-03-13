@@ -31,9 +31,6 @@ class Manager(Observable):
     def __init__(self):
         Observable.__init__(self)
 
-    def notify(self, obj, name, new_value):
-        print 'Manager got notify: %s, %s, %s' % (obj, name, new_value)
-
     def add_application(self, app):
         # If no apps added yet, make this one current
         if not self.applications:

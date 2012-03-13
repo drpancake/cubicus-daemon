@@ -1,17 +1,10 @@
 
-from observable import Observable, new_attribute
-
-class LayoutElement(Observable):
+class LayoutElement(object):
     def __init__(self, element_id, element_type, ratio, ** params):
-        Observable.__init__(self)
         self.element_id = element_id
         self.element_type = element_type
         self.ratio = ratio
         self._params = params
-
-    def notify(self, obj, name, new_value):
-        # Forward along incoming notifications to any observers
-        self.forward(obj, name, new_value)
 
     def send_event(self, event):
         if event.element_id == self.element_id:
@@ -41,14 +34,8 @@ class LayoutElement(Observable):
 class Box(LayoutElement):
     def __init__(self, element_id, element_type, ratio, ** params):
         LayoutElement.__init__(self, element_id, element_type, ratio, ** params)
-
-        # Convert 'items' list to objects
-        items = []
-        for item_json in params['items']:
-            item = LayoutElement.from_json(item_json)
-            item.subscribe(self) # Notifications will be forwarded
-            items.append(item)
-        self.items = items
+        # Inflate child items
+        self.items = [LayoutElement.from_json(item) for item in params['items']]
 
     def send_event(self, event):
         map(lambda item: item.send_event(event), self.items)
@@ -67,11 +54,10 @@ class Canvas(LayoutElement):
     def send_event(self, event):
         if event.element_id == self.element_id:
             print 'Canvas got event: %s' % event
-            self.add_path([(0, 0), (5, 5)])
+            #self.add_path([(0, 0), (5, 5)])
 
     def add_path(self, points):
         self._paths.append(points)
-        self.forward(self, 'event:new_path', points)
 
     def clear(self):
         pass
