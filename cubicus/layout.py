@@ -23,6 +23,8 @@ class LayoutElement(object):
             return Box(id_, type_, ratio, ** params)
         elif type_ == 'canvas':
             return Canvas(id_, type_, ratio, ** params)
+        elif type_ == 'button':
+            return Button(id_, type_, ratio, ** params)
         else:
             return LayoutElement(id_, type_, ratio, ** params)
 
@@ -61,4 +63,15 @@ class Canvas(LayoutElement):
 
     def clear(self):
         pass
+
+class Button(LayoutElement):
+    def __init__(self, element_id, element_type, ratio, ** params):
+        LayoutElement.__init__(self, element_id, element_type, ratio, ** params)
+        self.label = params['label']
+
+    def to_json(self):
+        # Augment base element JSON with each child item's JSON
+        d = LayoutElement.to_json(self)
+        d['label'] = self.label
+        return d
 
