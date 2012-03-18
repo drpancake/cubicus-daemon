@@ -19,6 +19,13 @@ class DeviceSocketThread(SocketThread):
         print '%s got %s => %s' % (self, name, new_value)
         if name in ['current_context', 'current_application']:
             self.send_state()
+        elif name == 'event':
+            event = new_value
+            if event.source != Event.DEVICE_EVENT:
+                # Event originated elsewhere, so forward it
+                # to the device
+                print 'queuing event: %s' % event.to_json()
+                self.queue_message('event', event.to_json())
 
     def allowed_types(self):
         types = ['device_identify', 'state', 'event']

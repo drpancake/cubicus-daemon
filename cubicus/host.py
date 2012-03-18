@@ -35,8 +35,13 @@ class ApplicationSocketThread(SocketThread):
     def handle_switch_context(self, context_id):
         self.manager.current_context = context_id
 
-    def handle_event(self, event):
+    def handle_event(self, json_event):
+        event = Event.from_json(json_event)
+
         # App has no knowledge of its application_id, so set it here
-        event['application_id'] = self._app.application_id
-        self.manager.send_event(Event.from_json(event))
+        event.application_id = self._app.application_id
+        
+        # Indicate that the event came from an app socket
+        event.source = Event.APP_EVENT
+        self.manager.send_event(event)
 

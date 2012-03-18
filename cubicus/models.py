@@ -56,13 +56,26 @@ class Application(object):
         #return {'id': 1, 'contexts': [{'id': 1, 'layout': l1}]}
 
 class Event(object):
-    def __init__(self, application_id, context_id, element_id, content):
+    DEVICE_EVENT = 1
+    APP_EVENT = 2
+
+    def __init__(self, application_id, context_id, element_id,
+                 content, source=None):
+        """
+        event_source = DEVICE_EVENT or APP_EVENT
+        """
         self.application_id = application_id
         self.context_id = context_id
         self.element_id = element_id
         self.content = content
+        self.source = source
         
     @staticmethod
     def from_json(d):
         return Event(** d)
+
+    def to_json(self):
+        return {'application_id': self.application_id,
+                'context_id': self.context_id, 'element_id': self.element_id,
+                'content': self.content}
 

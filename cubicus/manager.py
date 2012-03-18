@@ -1,5 +1,6 @@
 
 from observable import Observable, new_attribute
+from cubicus.models import Event
 
 class Singleton(type):
     """
@@ -50,6 +51,17 @@ class Manager(Observable):
         self.applications = filter(lambda a: a != app, self.applications)
 
     def send_event(self, event):
-        # Forward to all applications
+        # Forward to all applications so the layout hierarchy
+        # can keep state
         map(lambda app: app.send_event(event), self.applications)
+
+        # Notify observers of new event
+        self.forward(self, 'event', event)
+
+        ## Can be called by a device/app socket thread, so decide where to
+        ## forward the event based on its source
+        #if event.source == Event.APP_EVENT:
+            #pass
+        #elif event.source == Event.DEVICE_EVENT:
+            #pass
 
