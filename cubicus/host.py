@@ -22,6 +22,13 @@ class ApplicationSocketThread(SocketThread):
             man = self.manager
             if man.current_application == self._app.application_id:
                 self.queue_message('switch_context', man.current_context)
+        elif name == 'event':
+            event = new_value
+            if event.source != Event.APP_EVENT and \
+               event.application_id == self._app.application_id:
+                # Event originated elsewhere and is intended for this
+                # app, so forward it
+                self.queue_message('event', event.to_json())
 
     def allowed_types(self):
         types = ['application_identify', 'switch_context', 'event']

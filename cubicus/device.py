@@ -16,7 +16,6 @@ class DeviceSocketThread(SocketThread):
         self.manager.subscribe(self)
 
     def notify(self, obj, name, new_value):
-        print '%s got %s => %s' % (self, name, new_value)
         if name in ['current_context', 'current_application']:
             self.send_state()
         elif name == 'event':
@@ -24,7 +23,6 @@ class DeviceSocketThread(SocketThread):
             if event.source != Event.DEVICE_EVENT:
                 # Event originated elsewhere, so forward it
                 # to the device
-                print 'queuing event: %s' % event.to_json()
                 self.queue_message('event', event.to_json())
 
     def allowed_types(self):
@@ -67,6 +65,8 @@ class DeviceSocketThread(SocketThread):
         self.manager.current_application = state['current_application']
         self.manager.current_context = state['current_context']
 
-    def handle_event(self, event):
-        self.manager.send_event(Event.from_json(event))
+    def handle_event(self, json_event):
+        event = Event.from_json(json_event)
+        event.source = Event.DEVICE_EVENT
+        self.manager.send_event(event)
 
