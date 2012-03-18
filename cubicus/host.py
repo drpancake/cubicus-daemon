@@ -3,6 +3,7 @@ import os
 
 from cubicus.utils import SocketThread
 from cubicus.models import Application, Context
+from cubicus.models import Event
 
 class ApplicationSocketThread(SocketThread):
     """
@@ -23,7 +24,7 @@ class ApplicationSocketThread(SocketThread):
                 self.queue_message('switch_context', man.current_context)
 
     def allowed_types(self):
-        types = ['application_identify', 'switch_context']
+        types = ['application_identify', 'switch_context', 'event']
         return SocketThread.allowed_types(self) + types
 
     def handle_application_identify(self, json_app):
@@ -33,4 +34,10 @@ class ApplicationSocketThread(SocketThread):
 
     def handle_switch_context(self, context_id):
         self.manager.current_context = context_id
+
+    def handle_event(self, event):
+        # App has no knowledge of its application_id, so set it here
+        event['content']['application_id'] = self._app.application_id
+        print 'got event: %s' % event
+        self.manager.send_event(Event.from_json(event))
 
