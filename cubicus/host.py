@@ -37,7 +37,6 @@ class ApplicationSocketThread(SocketThread):
 
     def handle_event(self, event):
         # App has no knowledge of its application_id, so set it here
-        event['content']['application_id'] = self._app.application_id
-        print 'got event: %s' % event
+        event['application_id'] = self._app.application_id
         self.manager.send_event(Event.from_json(event))
 
