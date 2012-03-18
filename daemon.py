@@ -9,7 +9,8 @@ import pybonjour
 
 from cubicus.device import DeviceSocketThread
 from cubicus.host import ApplicationSocketThread
-from cubicus.utils import LogMixin, ConnectionListener
+from cubicus.utils import LogMixin
+from cubicus.sock import ConnectionListener
 
 class BonjourService(Thread, LogMixin):
     """

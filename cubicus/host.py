@@ -1,7 +1,7 @@
 
 import os
 
-from cubicus.utils import SocketThread
+from cubicus.sock import SocketThread
 from cubicus.models import Application, Context
 from cubicus.models import Event
 
