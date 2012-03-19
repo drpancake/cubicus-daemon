@@ -51,18 +51,21 @@ class Box(LayoutElement):
 class Canvas(LayoutElement):
     def __init__(self, element_id, element_type, ratio, ** params):
         LayoutElement.__init__(self, element_id, element_type, ratio, ** params)
-        self._paths = []
+        self._points = []
 
     def send_event(self, event):
         if event.element_id == self.element_id:
-            print 'Canvas got event: %s' % event
-            #self.add_path([(0, 0), (5, 5)])
-
-    def add_path(self, points):
-        self._paths.append(points)
+            self._points += event.content['points']
 
     def clear(self):
         pass
+
+    def to_json(self):
+        # Augment base element JSON
+        d = LayoutElement.to_json(self)
+        d['points'] = self._points
+        return d
+
 
 class Button(LayoutElement):
     def __init__(self, element_id, element_type, ratio, ** params):
