@@ -71,10 +71,20 @@ class Button(LayoutElement):
     def __init__(self, element_id, element_type, ratio, ** params):
         LayoutElement.__init__(self, element_id, element_type, ratio, ** params)
         self.label = params['label']
+        self.selected = params['selected']
+        self.group = params.get('group')
 
     def to_json(self):
         # Augment base element JSON with each child item's JSON
         d = LayoutElement.to_json(self)
         d['label'] = self.label
+        d['selected'] = self.selected
+        if self.group is not None:
+            d['group'] = self.group
         return d
+
+    #def send_event(self, event):
+        #if event.element_id == self.element_id:
+        #print 'button %s got event: %s' % (self, event)
+
 
