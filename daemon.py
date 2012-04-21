@@ -55,9 +55,9 @@ class DeviceListener(ConnectionListener):
 
 
 if __name__ == '__main__':
-    name = 'TestService'
-    regtype = '_test._tcp'
-    device_port = 1234
+    name = 'Cubicus'
+    regtype = '_cubicus._tcp'
+    device_port = 28738
     app_port = 28739
 
     # Listener for Bonjour broadcasts
