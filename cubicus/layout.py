@@ -40,6 +40,26 @@ class Box(LayoutElement):
         self.items = [LayoutElement.from_json(item) for item in params['items']]
 
     def send_event(self, event):
+        # Find the element the event is intended for, if it's a button
+        # we need to take button groups into account
+        elements = filter(lambda item: item.element_id == event.element_id,
+                          self.items)
+        assert len(elements) == 1
+        el = elements[0]
+        if el.element_type == 'button' and el.group is not None:
+            # Special case for buttons in a group (i.e. radio buttons)
+
+            # Note: the intended button still gets passed the event
+            # and thus selects itself
+            
+            # Grab all _other_ buttons in the group and ensure that
+            # they are deselected
+            buttons = filter(lambda item: item.element_type == 'button' and \
+                             item.group == el.group and item != el, self.items)
+            for button in buttons:
+                button.selected = False
+
+        # Unconditionally pass event to all child items
         map(lambda item: item.send_event(event), self.items)
     
     def to_json(self):
@@ -83,8 +103,8 @@ class Button(LayoutElement):
             d['group'] = self.group
         return d
 
-    #def send_event(self, event):
-        #if event.element_id == self.element_id:
-        #print 'button %s got event: %s' % (self, event)
-
+    def send_event(self, event):
+        # Assume this is a 'selected' event
+        if event.element_id == self.element_id:
+            self.selected = event.content['selected']
 
