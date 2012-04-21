@@ -72,10 +72,14 @@ class Canvas(LayoutElement):
     def __init__(self, element_id, element_type, ratio, ** params):
         LayoutElement.__init__(self, element_id, element_type, ratio, ** params)
         self.points = params.get('points', [])
+        self.color = params.get('color', None)
 
     def send_event(self, event):
         if event.element_id == self.element_id:
-            self.points += event.content['points']
+            if 'points' in event.content:
+                self.points += event.content['points']
+            elif 'color' in event.content:
+                self.color = event.content['color']
 
     def clear(self):
         pass
@@ -84,8 +88,8 @@ class Canvas(LayoutElement):
         # Augment base element JSON
         d = LayoutElement.to_json(self)
         d['points'] = self.points
+        d['color'] = self.color
         return d
-
 
 class Button(LayoutElement):
     def __init__(self, element_id, element_type, ratio, ** params):
