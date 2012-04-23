@@ -25,6 +25,8 @@ class LayoutElement(object):
             return Canvas(id_, type_, ratio, ** params)
         elif type_ == 'button':
             return Button(id_, type_, ratio, ** params)
+        elif type_ == 'accelerator':
+            return Accelerator(id_, type_, ratio, ** params)
         else:
             return LayoutElement(id_, type_, ratio, ** params)
 
@@ -111,4 +113,12 @@ class Button(LayoutElement):
         # Assume this is a 'selected' event
         if event.element_id == self.element_id:
             self.selected = event.content['selected']
+
+class Accelerator(LayoutElement):
+    def __init__(self, element_id, element_type, ratio, ** params):
+        LayoutElement.__init__(self, element_id, element_type, ratio, ** params)
+
+    def send_event(self, event):
+        # No need to store acceleration events
+        pass
 
