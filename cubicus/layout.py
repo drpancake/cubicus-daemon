@@ -46,20 +46,21 @@ class Box(LayoutElement):
         # we need to take button groups into account
         elements = filter(lambda item: item.element_id == event.element_id,
                           self.items)
-        assert len(elements) == 1
-        el = elements[0]
-        if el.element_type == 'button' and el.group is not None:
-            # Special case for buttons in a group (i.e. radio buttons)
+        if elements:
+            assert len(elements) == 1
+            el = elements[0]
+            if el.element_type == 'button' and el.group is not None:
+                # Special case for buttons in a group (i.e. radio buttons)
 
-            # Note: the intended button still gets passed the event
-            # and thus selects itself
-            
-            # Grab all _other_ buttons in the group and ensure that
-            # they are deselected
-            buttons = filter(lambda item: item.element_type == 'button' and \
-                             item.group == el.group and item != el, self.items)
-            for button in buttons:
-                button.selected = False
+                # Note: the intended button still gets passed the event
+                # and thus selects itself
+                
+                # Grab all _other_ buttons in the group and ensure that
+                # they are deselected
+                buttons = filter(lambda item: item.element_type == 'button' and \
+                                 item.group == el.group and item != el, self.items)
+                for button in buttons:
+                    button.selected = False
 
         # Unconditionally pass event to all child items
         map(lambda item: item.send_event(event), self.items)
