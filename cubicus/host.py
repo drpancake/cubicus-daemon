@@ -22,6 +22,9 @@ class ApplicationSocketThread(SocketThread):
             man = self.manager
             if man.current_application == self._app.application_id:
                 self.queue_message('switch_context', man.current_context)
+                # Make sure the application comes to foreground in any case
+                self.queue_message('become_active')
+
         elif name == 'event':
             event = new_value
             if event.source != Event.APP_EVENT and \
