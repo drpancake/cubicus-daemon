@@ -34,8 +34,24 @@ class ApplicationSocketThread(SocketThread):
                 self.queue_message('event', event.to_json())
 
     def allowed_types(self):
-        types = ['application_identify', 'switch_context', 'event']
+        types = ['application_identify', 'switch_context', 'event',
+                 'became_active']
         return SocketThread.allowed_types(self) + types
+
+    def handle_became_active(self):
+        if self._app:
+            app_id = self._app.application_id
+            # Switch to this application remotely if it's not already active
+            if self.manager.current_application != app_id:
+                self.manager.current_application = app_id
+
+                # Switch to default (or first) of this app's contexts
+                cid = None
+                if self._app.default_context is not None:
+                    cid = self._app.default_context
+                else:
+                    cid = self._app.contexts[0].context_id
+                self.manager.current_context = cid
 
     def handle_application_identify(self, json_app):
         app = Application.from_json(json_app)
