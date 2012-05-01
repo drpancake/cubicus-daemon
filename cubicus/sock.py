@@ -77,7 +77,10 @@ class SocketThread(Thread, LogMixin):
         assert msg['type'] in self.allowed_types()
         try:
             method = getattr(self, 'handle_%s' % msg['type'])
-            method(msg['content'])
+            if 'content' in msg:
+                method(msg['content'])
+            else:
+                method()
         except AttributeError, e:
             # TODO: handle this
             pass
