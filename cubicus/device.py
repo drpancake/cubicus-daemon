@@ -49,7 +49,7 @@ class DeviceSocketThread(SocketThread):
     def handle_pair_response(self, pin):
         if pin == self._pin:
             # Successfully paired so store the GUID
-            fp = open(PAIRINGS_FILE, 'w')
+            fp = open(PAIRINGS_FILE, 'a')
             fp.write('%s\n' % self._challenged_guid)
             fp.close()
 
