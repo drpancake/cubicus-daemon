@@ -1,8 +1,19 @@
 
 import os
+import random
 
 from cubicus.sock import SocketThread
 from cubicus.models import Event
+
+PAIRINGS_FILE = 'pairings.dat'
+
+def display_pin(pin):
+    """ Kludge - PIL for now """
+    from PIL import Image, ImageDraw
+    im = Image.new('RGBA', (300, 100))
+    draw = ImageDraw.Draw(im)
+    draw.text((5, 5), pin)
+    im.show()
 
 class DeviceSocketThread(SocketThread):
     """
@@ -11,6 +22,8 @@ class DeviceSocketThread(SocketThread):
     def __init__(self, clientsocket):
         SocketThread.__init__(self, clientsocket)
         self._paired = False
+        self._challenged_guid = None
+        self._pin = None
 
         # Subscribe to manager updates
         self.manager.subscribe(self)
@@ -26,12 +39,27 @@ class DeviceSocketThread(SocketThread):
                 self.queue_message('event', event.to_json())
 
     def allowed_types(self):
-        types = ['device_identify', 'state', 'event']
+        types = ['device_identify', 'state', 'event', 'pair_response']
         return SocketThread.allowed_types(self) + types
 
     def send_applications(self):
         apps = map(lambda a: a.to_json(), self.manager.applications)
         self.queue_message('applications', apps)
+
+    def handle_pair_response(self, pin):
+        if pin == self._pin:
+            # Successfully paired so store the GUID
+            fp = open(PAIRINGS_FILE, 'w')
+            fp.write('%s\n' % self._challenged_guid)
+            fp.close()
+
+            # Continue to next step
+            self._paired = True
+            self.send_applications()
+            self.send_state()
+        else:
+            self.queue_message('pair_failure')
+            self.stop()
 
     def handle_device_identify(self, guid):
         """
@@ -40,26 +68,29 @@ class DeviceSocketThread(SocketThread):
         the remaining handshake messages
         """
         assert self._paired is False
-        pairings_fil = 'pairings.dat'
 
         # Touch if its not there
-        if not os.path.isfile(pairings_fil):
-            open(pairings_fil, 'w').close()
+        if not os.path.isfile(PAIRINGS_FILE):
+            open(PAIRINGS_FILE, 'w').close()
 
-        fp = open(pairings_fil, 'r')
+        fp = open(PAIRINGS_FILE, 'r')
         s = fp.read()
         fp.close()
         pairs = s.split('\n')
-        if guid not in pairs:
-            # TODO: pairing process starts
-            # could use 'expected' array for recv
-            self.log('Need to pair! continuing anyway')
-            self._paired = True
 
-        # Once we're paired, next step is to send 'applications'
-        # and 'state' messages
-        self.send_applications()
-        self.send_state()
+        if guid not in pairs:
+            # Unknown GUID so challenge for a random PIN number
+            self.log('Need to pair for "%s"' % guid)
+            self._challenged_guid = guid
+            self._pin = ''.join(map(str, [random.randint(0, 9)
+                                          for i in range(4)]))
+            display_pin(self._pin) # Display on host machine
+            self.queue_message('pair_request')
+        else:
+            # Already paired, continue to next step
+            self._paired = True
+            self.send_applications()
+            self.send_state()
 
     def handle_state(self, state):
         self.manager.current_application = state['current_application']

@@ -82,7 +82,7 @@ class SocketThread(Thread, LogMixin):
             # TODO: handle this
             pass
 
-    def queue_message(self, type_, content):
+    def queue_message(self, type_, content=None):
         msg = {
             'type': type_,
             'content': content
